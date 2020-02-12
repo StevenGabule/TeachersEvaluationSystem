@@ -1,0 +1,71 @@
+*, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h2, h5 {
+    text-align: center;
+}
+
+body {
+    background-color: #6c757d;
+}
+
+.container {
+    width: 900px;
+    margin: 5% auto 0;
+
+    min-height: 600px;
+    background-color: white;
+}
+
+.col {
+    padding: 20px;
+}
+
+.form-control {
+    width: 100%;
+}
+
+.form-textarea {
+    width: 100%;
+    resize: none;
+    padding: 10px
+}
+
+.form-control-md {
+    width: 80%;
+}
+
+.form-control-sm {
+    width: 70%;
+}
+
+ol {
+    list-style: none;
+
+}
+
+ol li {
+    display: block;
+    float: left;
+    margin-right: 2%;
+}
+
+.m1 {
+    margin-bottom: 10px;
+}
+
+.average-text {
+    text-align: right;
+    font-weight: bold;
+    padding-right: 10px;
+}
+.center {
+    text-align: center;
+}
+
+tr{
+    vertical-align: middle;
+}

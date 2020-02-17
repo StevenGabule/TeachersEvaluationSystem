@@ -1,6 +1,7 @@
 <component name="ProjectDictionaryState">
   <dictionary name="John paul">
     <words>
+      <w>addon</w>
       <w>datatables</w>
       <w>dbcon</w>
       <w>dbname</w>
@@ -8,8 +9,10 @@
       <w>htmlspecialchars</w>
       <w>laragon</w>
       <w>lastname</w>
+      <w>navbar</w>
       <w>sait</w>
       <w>signin</w>
+      <w>tblsurvey</w>
       <w>tblusers</w>
       <w>webroot</w>
     </words>

@@ -9,13 +9,26 @@ h2, h5 {
 }
 
 body {
-    background-color: #6c757d;
+    background-color: #efefef;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    line-height: 1.64em;
+}
+
+.pl-1 {
+    padding-left: 10px;
+}
+
+input[type="radio"] {
+    vertical-align: middle;
 }
 
 .container {
     width: 900px;
-    margin: 5% auto 0;
-
+    margin: 3% auto 0;
+    -webkit-box-shadow: 6px 15px 40px -17px rgba(0,0,0,0.75);
+    -moz-box-shadow: 6px 15px 40px -17px rgba(0,0,0,0.75);
+    box-shadow: 6px 15px 40px -17px rgba(0,0,0,0.75);
     min-height: 600px;
     background-color: white;
 }
@@ -39,7 +52,7 @@ body {
 }
 
 .form-control-sm {
-    width: 70%;
+    width: 68%;
 }
 
 ol {

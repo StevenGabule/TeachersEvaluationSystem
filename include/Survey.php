@@ -141,6 +141,25 @@ class Survey extends DB_Object
         }
         return false;
     }
+
+    public static function SurveyResults()
+    {
+        global $db;
+        $the_object_array = array();
+        $sql = 'select tblsurvey.id, tblteachers.name as \'TeacherName\', tblsubjects.subject, tblusers.name FROM tblsurvey 
+                INNER JOIN tblteachers ON tblteachers.id = tblsurvey.teacher_id 
+                INNER JOIN tblsubjects on tblsubjects.id = tblsurvey.subject_id 
+                INNER JOIN tblusers on tblusers.id = tblsurvey.student_id';
+        $result = $db->query($sql);
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_array($result)) {
+                $the_object_array[] = static::instantiation($row);
+            }
+        }
+        return $the_object_array;
+//        $the_result_array = static::find_by_query($sql);
+//        return !empty($the_result_array) ? array_shift($the_result_array) : false;
+    }
 }
 
 

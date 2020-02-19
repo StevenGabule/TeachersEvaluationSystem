@@ -14,3 +14,4 @@ require_once(INCLUDES_PATH.DS. 'db_object.php');
 require_once(INCLUDES_PATH.DS. 'Session.php');
 require_once(INCLUDES_PATH.DS. 'Users.php');
 require_once(INCLUDES_PATH.DS. 'Survey.php');
+require_once(INCLUDES_PATH.DS. 'Subjects.php');

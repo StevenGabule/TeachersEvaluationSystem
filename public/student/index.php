@@ -11,6 +11,7 @@ $teacher_skills_one = $teachers_skills_two = $teacher_skills_three = $teacher_sk
 $classroom_management_one = $classroom_management_two = $classroom_management_three = $classroom_management_four = $classroom_management_five = $classroom_management_six = '';
 $personal_social_one = $personal_social_two = $personal_social_three = $personal_social_four = $personal_social_five = $personal_social_six = $personal_social_seven = $personal_social_eight = $personal_social_nine = $personal_social_ten = '';
 $comments = $suggestions = '';
+$subId = '';
 
 function displayCurrentDate()
 {
@@ -19,6 +20,7 @@ function displayCurrentDate()
 }
 
 $survey = new Survey();
+$subjects = Subjects::find_all();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_POST['knowledge_one']) || empty($_POST['knowledge_two']) || empty($_POST['knowledge_three']) || empty($_POST['knowledge_four']) || empty($_POST['knowledge_five']) ||
@@ -97,15 +99,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $comments = $_POST['comments'];
         $suggestions = $_POST['suggestions'];
+        $subId = $_POST['subject'];
+        $studId = $_SESSION['id'];
 
-        $result = $survey->SaveSurvey(1, 1, 1,
+        $result = $survey->SaveSurvey(1, $subId, $studId,
             $knowledge_one, $knowledge_two, $knowledge_three, $knowledge_four, $knowledge_five, $teacher_skills_one, $teacher_skills_two, $teacher_skills_three, $teacher_skills_four, $teacher_skills_six, $teacher_skills_six, $teacher_skills_seven, $teacher_skills_eight, $teacher_skills_nine,
             $classroom_management_one, $classroom_management_two, $classroom_management_three, $classroom_management_four, $classroom_management_five, $classroom_management_six,
             $personal_social_one, $personal_social_two, $personal_social_three, $personal_social_four, $personal_social_five, $personal_social_six, $personal_social_seven, $personal_social_eight, $personal_social_nine, $personal_social_ten,
             $commitment_one, $commitment_two, $commitment_three, $commitment_four, $comments, $suggestions);
+
         if ($result) {
             redirect_to('thank_you.php');
         }
+
     }
 }
 ?>
@@ -131,16 +137,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <table style="width: 100%">
                     <tr>
                         <td style="width: 31%"><p style="font-weight: bold">Name of the Teacher Evaluated:</p></td>
-                        <td><input type="text" class="form-control" name="teacher_name" value="Ms. Margareta"
-                                   id="teacher_name" readonly></td>
+                        <td>
+                            <input type="text" class="form-control" name="teacher_name" value="Ms. Margareta"
+                                   id="teacher_name" readonly>
+                        </td>
                     </tr>
                     <tr>
                         <td colspan="2">
                             <table style="width:100%;">
                                 <tr>
-                                    <td><span style="font-weight: bold">Subject: </span><input type="text"
-                                                                                               class="form-control-md"
-                                                                                               name="subject"></td>
+                                    <td>
+                                        <span style="font-weight: bold" id="subject">Subject: </span>
+
+                                        <select name="subject" id="subject" class="form-control-md">
+                                            <?php foreach($subjects as $subject) : ?>
+                                                <option value="<?= $subject->id ?>"><?= $subject->subject ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </td>
                                     <td><span style="font-weight: bold">Date Of Evaluation:</span> <input
                                                 class="form-control-sm" type="text" name="eval_date"
                                                 value="<?= displayCurrentDate() ?>"></td>

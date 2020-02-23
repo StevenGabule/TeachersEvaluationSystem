@@ -1,10 +1,11 @@
 <?php require 'layouts/header.php';
-
-function chopExtension($filename) {
-    return substr($filename, 0, strrpos($filename, '.'));
+if (!$session->is_signed_in()) {
+    redirect_to('../login.php');
 }
 
 $url = basename(__FILE__, '.php');
+$teachers = Teacher::find_all();
+
 ?>
 <!-- Sidebar -->
 <ul class="sidebar navbar-nav">
@@ -42,6 +43,11 @@ $url = basename(__FILE__, '.php');
             <i class="fas fa-fw fa-users-cog"></i>
             <span class="ml-2">Accounts</span></a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal">
+            <i class="fas fa-fw fa-lock"></i>
+            <span class="ml-2">Logout</span></a>
+    </li>
 </ul><!-- end of sidebar -->
 
 <div id="content-wrapper">
@@ -61,13 +67,48 @@ $url = basename(__FILE__, '.php');
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title">Teachers</div>
-                    </div>
-                </div>
+                        <div class="card-title d-flex justify-content-between align-items-center">
+                            <h4>Teachers</h4>
+                            <a href="teachers_add.php" class="btn btn-sm btn-info">New Teacher</a>
+                        </div>
+                        <?php if($session->message()) echo $session->message() ?>
+
+                        <table class="table table-bordered table-sm" id="table-teacher">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Bachelor</th>
+                                <th>Date Register</th>
+                                <th width="20%">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($teachers as $teacher) : ?>
+                            <tr>
+                                <td><?= $teacher->id ?></td>
+                                <td class="text-capitalize"><?= $teacher->name ?></td>
+                                <td class="text-capitalize"><?= $teacher->bachelor ?></td>
+                                <td><?= time_elapsed_string($teacher->date_register) ?></td>
+                                <td>
+                                    <a href="teachers_edit.php?id=<?=$teacher->id?>" class="btn-link">Edit</a> |
+                                    <a href="teacher_destroy.php?id=<?=$teacher->id?>" class="btn-link">Delete</a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table><!-- end of table -->
+                    </div><!-- end of card body -->
+                </div><!-- end of card -->
             </div>
         </div>
     </div>
     <!-- /.container-fluid -->
 
     <?php require 'layouts/footer.php' ?>
+    <script>
+        $(document).ready( function () {
+            $('#table-teacher').DataTable();
+        } );
+    </script>
 

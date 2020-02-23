@@ -3,6 +3,16 @@
 if (!$session->is_signed_in()) {
     redirect_to('../login.php');
 }
+$id = $_SESSION['id'];
+if (Survey::checkStudent($id)) {
+    $session->message('<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                  <strong>OOPS!</strong> Your account has been already take the teacher evaluation.
+                                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>');
+    redirect_to('../login.php');
+}
 
 $name = $_SESSION['name'];
 $knowledge_one = $knowledge_two = $knowledge_three = $knowledge_four = $knowledge_five = '';
@@ -21,6 +31,8 @@ function displayCurrentDate()
 
 $survey = new Survey();
 $subjects = Subjects::find_all();
+$teachers = Teacher::find_all();
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_POST['knowledge_one']) || empty($_POST['knowledge_two']) || empty($_POST['knowledge_three']) || empty($_POST['knowledge_four']) || empty($_POST['knowledge_five']) ||
@@ -100,9 +112,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $comments = $_POST['comments'];
         $suggestions = $_POST['suggestions'];
         $subId = $_POST['subject'];
+        $teacherId = $_POST['teacher_id'];
         $studId = $_SESSION['id'];
 
-        $result = $survey->SaveSurvey(1, $subId, $studId,
+        $result = $survey->SaveSurvey($teacherId, $subId, $studId,
             $knowledge_one, $knowledge_two, $knowledge_three, $knowledge_four, $knowledge_five, $teacher_skills_one, $teacher_skills_two, $teacher_skills_three, $teacher_skills_four, $teacher_skills_six, $teacher_skills_six, $teacher_skills_seven, $teacher_skills_eight, $teacher_skills_nine,
             $classroom_management_one, $classroom_management_two, $classroom_management_three, $classroom_management_four, $classroom_management_five, $classroom_management_six,
             $personal_social_one, $personal_social_two, $personal_social_three, $personal_social_four, $personal_social_five, $personal_social_six, $personal_social_seven, $personal_social_eight, $personal_social_nine, $personal_social_ten,
@@ -125,6 +138,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Teachers Evaluation System - Students Portal</title>
     <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .text-capitalize {
+            text-transform: capitalize;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -138,8 +156,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <tr>
                         <td style="width: 31%"><p style="font-weight: bold">Name of the Teacher Evaluated:</p></td>
                         <td>
-                            <input type="text" class="form-control" name="teacher_name" value="Ms. Margareta"
-                                   id="teacher_name" readonly>
+                            <!--<input type="text" class="form-control" name="teacher_name" value="Ms. Margareta"
+                                   id="teacher_name">-->
+                            <select name="teacher_id" id="teacher_id" class="form-control">
+                                <?php foreach($teachers as $teacher) : ?>
+                                    <option value="<?= $teacher->id ?>"><?= ucwords($teacher->name) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -217,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    id="knowledge_one">
                         </td>
                         <td class="center"><input type="radio" name="knowledge_one" value="4"
-                                                  id="knowledge_one" <?= (isset($knowledge_one) && (int)$knowledge_one === 4) ? 'checked' : '' ?>>
+                                                  id="knowledge_one" checked <?= (isset($knowledge_one) && (int)$knowledge_one === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_one" value="3"
                                                   id="knowledge_one" <?= (isset($knowledge_one) && (int)$knowledge_one === 3) ? 'checked' : '' ?>>
@@ -231,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </tr>
                     <tr>
                         <td class="pl-1">2. Shows interest in the subject matter.</td>
-                        <td class="center"><input type="radio" name="knowledge_two" value="5"
+                        <td class="center"><input type="radio" checked name="knowledge_two" value="5"
                                                   id="knowledge_two" <?= (isset($knowledge_two) && (int)$knowledge_two === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_two" value="4"
@@ -256,7 +279,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                   id="knowledge_three" <?= (isset($knowledge_three) && (int)$knowledge_three === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_three" value="3"
-                                                  id="knowledge_three" <?= (isset($knowledge_three) && (int)$knowledge_three === 3) ? 'checked' : '' ?>>
+                                                  id="knowledge_three" checked <?= (isset($knowledge_three) && (int)$knowledge_three === 3) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_three" value="2"
                                                   id="knowledge_three" <?= (isset($knowledge_three) && (int)$knowledge_three === 2) ? 'checked' : '' ?>>
@@ -274,7 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                   id="knowledge_four" <?= (isset($knowledge_four) && (int)$knowledge_four === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_four" value="3"
-                                                  id="knowledge_four" <?= (isset($knowledge_four) && (int)$knowledge_four === 3) ? 'checked' : '' ?>>
+                                                  id="knowledge_four" checked <?= (isset($knowledge_four) && (int)$knowledge_four === 3) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_four" value="2"
                                                   id="knowledge_four" <?= (isset($knowledge_four) && (int)$knowledge_four === 2) ? 'checked' : '' ?>>
@@ -285,7 +308,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </tr>
                     <tr>
                         <td class="pl-1">5. Selects relevant materials effectively.</td>
-                        <td class="center"><input type="radio" name="knowledge_five" value="5"
+                        <td class="center"><input type="radio" checked name="knowledge_five" value="5"
                                                   id="knowledge_five" <?= (isset($knowledge_five) && (int)$knowledge_five === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_five" value="4"
@@ -294,7 +317,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="knowledge_five" value="3"
                                                   id="knowledge_five" <?= (isset($knowledge_five) && (int)$knowledge_five === 3) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="knowledge_five" value="2"
+                        <td class="center"><input type="radio" checked name="knowledge_five" value="2"
                                                   id="knowledge_five" <?= (isset($knowledge_five) && (int)$knowledge_five === 2) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="knowledge_five" value="1"
@@ -315,7 +338,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     value="5"
                                     id="teacher_skills_one" <?= (isset($teacher_skills_one) && (int)$teacher_skills_one === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="teacher_skills_one" value="4"
+                        <td class="center"><input type="radio" checked name="teacher_skills_one" value="4"
                                                   id="teacher_skills_one" <?= (isset($teacher_skills_one) && (int)$teacher_skills_one === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_one" value="3"
@@ -342,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="teacher_skills_two" value="2"
                                                   id="teacher_skills_two" <?= (isset($teacher_skills_two) && (int)$teacher_skills_two === 2) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="teacher_skills_two" value="1"
+                        <td class="center"><input type="radio" checked name="teacher_skills_two" value="1"
                                                   id="teacher_skills_two" <?= (isset($teacher_skills_two) && (int)$teacher_skills_two === 1) ? 'checked' : '' ?>>
                         </td>
                     </tr>
@@ -351,7 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="teacher_skills_three" value="5"
                                                   id="teacher_skills_three" <?= (isset($teacher_skills_three) && (int)$teacher_skills_three === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="teacher_skills_three" value="4"
+                        <td class="center"><input type="radio" checked name="teacher_skills_three" value="4"
                                                   id="teacher_skills_three" <?= (isset($teacher_skills_three) && (int)$teacher_skills_three === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_three" value="3"
@@ -374,7 +397,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                   id="teacher_skills_four" <?= (isset($teacher_skills_four) && (int)$teacher_skills_four === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_four" value="3"
-                                                  id="teacher_skills_four" <?= (isset($teacher_skills_four) && (int)$teacher_skills_four === 3) ? 'checked' : '' ?>>
+                                                  id="teacher_skills_four" checked <?= (isset($teacher_skills_four) && (int)$teacher_skills_four === 3) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_four" value="2"
                                                   id="teacher_skills_four" <?= (isset($teacher_skills_four) && (int)$teacher_skills_four === 2) ? 'checked' : '' ?>>
@@ -389,7 +412,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="teacher_skills_five" value="5"
                                                   id="teacher_skills_five" <?= (isset($teacher_skills_five) && (int)$teacher_skills_five === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="teacher_skills_five" value="4"
+                        <td class="center"><input type="radio" checked name="teacher_skills_five" value="4"
                                                   id="teacher_skills_five" <?= (isset($teacher_skills_five) && (int)$teacher_skills_five === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_five" value="3"
@@ -408,7 +431,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="teacher_skills_six" value="5"
                                                   id="teacher_skills_six" <?= (isset($teacher_skills_six) && (int)$teacher_skills_six === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="teacher_skills_six" value="4"
+                        <td class="center"><input type="radio" name="teacher_skills_six"  checked value="4"
                                                   id="teacher_skills_six" <?= (isset($teacher_skills_six) && (int)$teacher_skills_six === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_six" value="3"
@@ -427,7 +450,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="teacher_skills_seven" value="5"
                                                   id="teacher_skills_seven" <?= (isset($teacher_skills_seven) && (int)$teacher_skills_seven === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="teacher_skills_seven" value="4"
+                        <td class="center"><input type="radio" checked name="teacher_skills_seven" value="4"
                                                   id="teacher_skills_seven" <?= (isset($teacher_skills_seven) && (int)$teacher_skills_seven === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_seven" value="3"
@@ -443,7 +466,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">8. Makes subject matter relevant to course objectives.</td>
-                        <td class="center"><input type="radio" name="teacher_skills_eight" value="5"
+                        <td class="center"><input type="radio" checked name="teacher_skills_eight" value="5"
                                                   id="teacher_skills_eight" <?= (isset($teacher_skills_eight) && (int)$teacher_skills_eight === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_eight" value="4"
@@ -462,7 +485,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">9. Provides appropriate drills/seat works/assignments.</td>
-                        <td class="center"><input type="radio" name="teacher_skills_nine" value="5"
+                        <td class="center"><input type="radio"  checked name="teacher_skills_nine" value="5"
                                                   id="teacher_skills_nine" <?= (isset($teacher_skills_nine) && (int)$teacher_skills_nine === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="teacher_skills_nine" value="4"
@@ -492,7 +515,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="classroom_management_one" value="4"
                                                   id="classroom_management_one" <?= (isset($classroom_management_one) && (int)$classroom_management_one === 4) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="classroom_management_one" value="3"
+                        <td class="center"><input type="radio" checked name="classroom_management_one" value="3"
                                                   id="classroom_management_one" <?= (isset($classroom_management_one) && (int)$classroom_management_one === 3) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="classroom_management_one" value="2"
@@ -508,7 +531,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="classroom_management_two" value="5"
                                                   id="classroom_management_two" <?= (isset($classroom_management_two) && (int)$classroom_management_two === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="classroom_management_two" value="4"
+                        <td class="center"><input type="radio" checked name="classroom_management_two" value="4"
                                                   id="classroom_management_two" <?= (isset($classroom_management_two) && (int)$classroom_management_two === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="classroom_management_two" value="3"
@@ -530,7 +553,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="classroom_management_three" value="4"
                                                   id="classroom_management_three" <?= (isset($classroom_management_three) && (int)$classroom_management_three === 4) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="classroom_management_three" value="3"
+                        <td class="center"><input type="radio" checked name="classroom_management_three" value="3"
                                                   id="classroom_management_three" <?= (isset($classroom_management_three) && (int)$classroom_management_three === 3) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="classroom_management_three" value="2"
@@ -546,7 +569,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="classroom_management_four" value="5"
                                                   id="classroom_management_four" <?= (isset($classroom_management_four) && (int)$classroom_management_four === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="classroom_management_four" value="4"
+                        <td class="center"><input type="radio" checked name="classroom_management_four" value="4"
                                                   id="classroom_management_four" <?= (isset($classroom_management_four) && (int)$classroom_management_four === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="classroom_management_four" value="3"
@@ -562,7 +585,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">5. Explains grading system.</td>
-                        <td class="center"><input type="radio" name="classroom_management_five" value="5"
+                        <td class="center"><input type="radio" checked name="classroom_management_five" value="5"
                                                   id="classroom_management_five" <?= (isset($classroom_management_five) && (int)$classroom_management_five === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="classroom_management_five" value="4"
@@ -590,7 +613,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="classroom_management_six" value="3"
                                                   id="classroom_management_six" <?= (isset($classroom_management_six) && (int)$classroom_management_six === 3) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="classroom_management_six" value="2"
+                        <td class="center"><input type="radio" checked name="classroom_management_six" value="2"
                                                   id="classroom_management_six" <?= (isset($classroom_management_six) && (int)$classroom_management_six === 2) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="classroom_management_six" value="1"
@@ -612,7 +635,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="personal_social_one" value="4"
                                                   id="personal_social_one" <?= (isset($personal_social_one) && (int)$personal_social_one === 4) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="personal_social_one" value="3"
+                        <td class="center"><input type="radio" checked name="personal_social_one" value="3"
                                                   id="personal_social_one" <?= (isset($personal_social_one) && (int)$personal_social_one === 3) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_one" value="2"
@@ -628,7 +651,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="personal_social_two" value="5"
                                                   id="personal_social_two" <?= (isset($personal_social_two) && (int)$personal_social_two === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="personal_social_two" value="4"
+                        <td class="center"><input type="radio" checked name="personal_social_two" value="4"
                                                   id="personal_social_two" <?= (isset($personal_social_two) && (int)$personal_social_two === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_two" value="3"
@@ -644,7 +667,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">3. Discipline class.</td>
-                        <td class="center"><input type="radio" name="personal_social_three" value="5"
+                        <td class="center"><input type="radio" checked name="personal_social_three" value="5"
                                                   id="personal_social_three"<?= (isset($personal_social_three) && (int)$personal_social_three === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_three" value="4"
@@ -663,7 +686,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">4. Respect student's ideas and opinions.</td>
-                        <td class="center"><input type="radio" name="personal_social_four" value="5"
+                        <td class="center"><input type="radio" checked name="personal_social_four" value="5"
                                                   id="personal_social_four"<?= (isset($personal_social_four) && (int)$personal_social_four === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_four" value="4"
@@ -682,7 +705,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">5. Available to students for assistance.</td>
-                        <td class="center"><input type="radio" name="personal_social_five" value="5"
+                        <td class="center"><input type="radio" checked name="personal_social_five" value="5"
                                                   id="personal_social_five" <?= (isset($personal_social_five) && (int)$personal_social_five === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_five" value="4"
@@ -701,7 +724,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">6. Possesses sense of humor.</td>
-                        <td class="center"><input type="radio" name="personal_social_six" value="5"
+                        <td class="center"><input type="radio" checked name="personal_social_six" value="5"
                                                   id="personal_social_six" <?= (isset($personal_social_six) && (int)$personal_social_six === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_six" value="4"
@@ -723,7 +746,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="personal_social_seven" value="5"
                                                   id="personal_social_seven" <?= (isset($personal_social_seven) && (int)$personal_social_seven === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="personal_social_seven" value="4"
+                        <td class="center"><input type="radio" checked name="personal_social_seven" value="4"
                                                   id="personal_social_seven" <?= (isset($personal_social_seven) && (int)$personal_social_seven === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_seven" value="3"
@@ -748,7 +771,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="personal_social_eight" value="3"
                                                   id="personal_social_eight" <?= (isset($personal_social_eight) && (int)$personal_social_eight === 3) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="personal_social_eight" value="2"
+                        <td class="center"><input type="radio" checked name="personal_social_eight" value="2"
                                                   id="personal_social_eight" <?= (isset($personal_social_eight) && (int)$personal_social_eight === 2) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_eight" value="1"
@@ -758,7 +781,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">9. Adapts to classroom situations.</td>
-                        <td class="center"><input type="radio" name="personal_social_nine" value="5"
+                        <td class="center"><input type="radio" checked name="personal_social_nine" value="5"
                                                   id="personal_social_nine" <?= (isset($personal_social_nine) && (int)$personal_social_nine === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_nine" value="4"
@@ -777,7 +800,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">10. Carries self well with confidence.</td>
-                        <td class="center"><input type="radio" name="personal_social_ten" value="5"
+                        <td class="center"><input type="radio"  checked name="personal_social_ten" value="5"
                                                   id="personal_social_ten" <?= (isset($personal_social_ten) && (int)$personal_social_ten === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="personal_social_ten" value="4"
@@ -801,7 +824,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </tr>
                     <tr>
                         <td class="pl-1">1. Comes to class prepared.</td>
-                        <td class="center"><input type="radio" name="commitment_one" value="5"
+                        <td class="center"><input type="radio" checked name="commitment_one" value="5"
                                                   id="commitment_one" <?= (isset($commitment_one) && (int)$commitment_one === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="commitment_one" value="4"
@@ -823,7 +846,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="commitment_two" value="5"
                                                   id="commitment_two" <?= (isset($commitment_two) && (int)$commitment_two === 5) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="commitment_two" value="4"
+                        <td class="center"><input type="radio" checked name="commitment_two" value="4"
                                                   id="commitment_two" <?= (isset($commitment_two) && (int)$commitment_two === 4) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="commitment_two" value="3"
@@ -845,7 +868,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td class="center"><input type="radio" name="commitment_three" value="4"
                                                   id="commitment_three" <?= (isset($commitment_three) && (int)$commitment_three === 4) ? 'checked' : '' ?>>
                         </td>
-                        <td class="center"><input type="radio" name="commitment_three" value="3"
+                        <td class="center"><input type="radio" checked name="commitment_three" value="3"
                                                   id="commitment_three" <?= (isset($commitment_three) && (int)$commitment_three === 3) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="commitment_three" value="2"
@@ -858,7 +881,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <tr>
                         <td class="pl-1">4. Cares/Concerned for students.</td>
-                        <td class="center"><input type="radio" name="commitment_four" value="5"
+                        <td class="center"><input type="radio" checked name="commitment_four" value="5"
                                                   id="commitment_four" <?= (isset($commitment_four) && (int)$commitment_four === 5) ? 'checked' : '' ?>>
                         </td>
                         <td class="center"><input type="radio" name="commitment_four" value="4"
@@ -885,7 +908,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="m1"><label for="comment">1. What do you like / do not like about your
                         teacher?</label></p>
                 <textarea placeholder="Leave your comment here..." name="comments" id="comments" rows="7"
-                          class="form-textarea"><?= $comments ?></textarea>
+                          class="form-textarea"><?= $comments ?: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque autem commodi deleniti dignissimos dolore dolorem eius et odit praesentium quod. Consequuntur, cumque esse magnam minima qui sapiente voluptatibus? Consectetur, velit.' ?></textarea>
 
                 <br>
                 <br>
@@ -894,7 +917,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="m1"><label for="suggestions">2. Give your suggestions (if any) for the
                         improvement of your teacher?</label></p>
                 <textarea placeholder="Leave your suggestions here..." name="suggestions" id="suggestions" rows="7"
-                          class="form-textarea"><?= $suggestions ?></textarea>
+                          class="form-textarea"><?= $suggestions?:'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam animi commodi cumque esse hic iure, nemo officia quae quasi quis vel veritatis voluptatem, voluptatibus. Aperiam beatae facere fugiat illo sint.' ?></textarea>
                 <input type="submit" name="submit" value="Submit" style="margin-top: 10px;">
             </form>
         </div>

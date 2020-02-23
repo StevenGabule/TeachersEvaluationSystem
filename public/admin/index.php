@@ -43,6 +43,11 @@ $url = basename(__FILE__, '.php');
             <i class="fas fa-fw fa-users-cog"></i>
             <span class="ml-2">Accounts</span></a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal">
+            <i class="fas fa-fw fa-lock"></i>
+            <span class="ml-2">Logout</span></a>
+    </li>
 </ul><!-- end of sidebar -->
 
 <div id="content-wrapper">

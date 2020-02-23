@@ -89,48 +89,6 @@ class Survey extends DB_Object
     public $suggestions;
     public $date_evaluation;
 
-    /**
-     * @param int $teacher_id
-     * @param int $subject_id
-     * @param $student_id
-     * @param $k1
-     * @param $k2
-     * @param $k3
-     * @param $k4
-     * @param $k5
-     * @param $ts1
-     * @param $ts2
-     * @param $ts3
-     * @param $ts4
-     * @param $ts5
-     * @param $ts6
-     * @param $ts7
-     * @param $ts8
-     * @param $ts9
-     * @param $cm1
-     * @param $cm2
-     * @param $cm3
-     * @param $cm4
-     * @param $cm5
-     * @param $cm6
-     * @param $p1
-     * @param $p2
-     * @param $p3
-     * @param $p4
-     * @param $p5
-     * @param $p6
-     * @param $p7
-     * @param $p8
-     * @param $p9
-     * @param $p10
-     * @param $sm1
-     * @param $sm2
-     * @param $sm3
-     * @param $sm4
-     * @param $comments
-     * @param $suggestions
-     * @return bool
-     */
     public function SaveSurvey($teacher_id, $subject_id, $student_id, $k1, $k2, $k3, $k4, $k5, $ts1, $ts2, $ts3, $ts4, $ts5, $ts6, $ts7, $ts8, $ts9, $cm1, $cm2, $cm3, $cm4, $cm5, $cm6, $p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8, $p9, $p10, $sm1, $sm2, $sm3, $sm4, $comments, $suggestions)
     {
         global $db;
@@ -142,11 +100,19 @@ class Survey extends DB_Object
         return false;
     }
 
+    public static function checkStudent($id)
+    {
+        global $db;
+        $sql = "SELECT * FROM tblsurvey WHERE student_id = $id";
+        $result = $db->query($sql);
+        return (int)mysqli_num_rows($result) === 1;
+    }
+
     public static function SurveyResults()
     {
         global $db;
         $the_object_array = array();
-        $sql = 'select tblsurvey.id, tblteachers.name as \'TeacherName\', tblsubjects.subject, tblusers.name FROM tblsurvey 
+        $sql = 'select tblsurvey.id, tblteachers.name, tblsubjects.subject, tblusers.name FROM tblsurvey 
                 INNER JOIN tblteachers ON tblteachers.id = tblsurvey.teacher_id 
                 INNER JOIN tblsubjects on tblsubjects.id = tblsurvey.subject_id 
                 INNER JOIN tblusers on tblusers.id = tblsurvey.student_id';

@@ -192,7 +192,6 @@ class DB_Object
         $properties = $this->clean_properties();
         $sql = "INSERT INTO " . static::$db_table . "(" . implode(",", array_keys($properties)) . ") ";
         $sql .= "VALUES (" . implode("','", array_values($properties)) . "')";
-        print_r($sql);
         if ($db->query($sql)) {
             $this->id = $db->the_insert_id();
             return true;

@@ -15,3 +15,5 @@ require_once(INCLUDES_PATH.DS. 'Session.php');
 require_once(INCLUDES_PATH.DS. 'Users.php');
 require_once(INCLUDES_PATH.DS. 'Survey.php');
 require_once(INCLUDES_PATH.DS. 'Subjects.php');
+require_once(INCLUDES_PATH.DS. 'Teacher.php');
+require_once(INCLUDES_PATH.DS. 'Students.php');
